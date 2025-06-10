@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Financial Sentiment Predictor</title>
+<style>
+    /* Base styles */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #e8f0fe;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+    }
+
+    h1 {
+        color: #1a73e8;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+
+    form {
+        margin-top: 20px;
+        background-color: #fff;
+        padding: 20px 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(26, 115, 232, 0.2);
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        align-items: center;
+        transition: box-shadow 0.3s ease;
+    }
+    form:hover {
+        box-shadow: 0 6px 18px rgba(26, 115, 232, 0.35);
+    }
+
+    input[type="text"] {
+        width: 300px;
+        padding: 10px;
+        border: 1.5px solid #a8b9f2;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: border-color 0.3s ease;
+    }
+    input[type="text"]:focus {
+        border-color: #1a73e8;
+        outline: none;
+        box-shadow: 0 0 5px #a8b9f2;
+    }
+
+    input[type="submit"] {
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        padding: 10px 22px;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+    }
+
+    input[type="submit"]:hover {
+        background-color: #155ab6;
+    }
+
+    /* Modal styles */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(26, 115, 232, 0.15);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .modal {
+        background-color: #f9fbff;
+        padding: 25px 30px;
+        border-radius: 10px;
+        box-shadow: 0 8px 24px rgba(26, 115, 232, 0.25);
+        max-width: 380px;
+        width: 85%;
+        text-align: center;
+        position: relative;
+        color: #222;
+        animation: fadeInModal 0.25s ease forwards;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        border: 1.5px solid #1a73e8;
+    }
+
+    .modal strong {
+        display: block;
+        font-size: 20px;
+        margin-bottom: 18px;
+        color: #1a3e8e;
+    }
+
+    .modal .positive {
+        color: #1b6b1b;
+        border: 1.5px solid #1b6b1b;
+        padding: 7px 14px;
+        border-radius: 8px;
+        display: inline-block;
+        font-size: 17px;
+    }
+
+    .modal .neutral {
+        color: #c18400;
+        border: 1.5px solid #c18400;
+        padding: 7px 14px;
+        border-radius: 8px;
+        display: inline-block;
+        font-size: 17px;
+    }
+
+    .modal .negative {
+        color: #a12727;
+        border: 1.5px solid #a12727;
+        padding: 7px 14px;
+        border-radius: 8px;
+        display: inline-block;
+        font-size: 17px;
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 12px;
+        right: 14px;
+        background: #1a73e8;
+        border: none;
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        font-size: 18px;
+        line-height: 26px;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        font-weight: bold;
+    }
+
+    .close-btn:hover {
+        background-color: #155ab6;
+    }
+
+    @keyframes fadeInModal {
+        from {
+            opacity: 0;
+            transform: translateY(-12px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+</head>
+<body>
+<h1>Financial Sentiment Predictor</h1>
+<form method="POST">
+    <input type="text" name="headline" placeholder="Enter news headline..." required value="{{ headline }}">
+    <input type="submit" value="Predict">
+</form>
+
+{% if sentiment %}
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <button class="close-btn" id="closeBtn" aria-label="Close modal">&times;</button>
+        <strong id="modalTitle">Prediction:</strong>
+        {% if "reduce" in sentiment %}
+            <span class="negative">{{ sentiment }}</span>
+        {% elif "unaffected" in sentiment %}
+            <span class="neutral">{{ sentiment }}</span>
+        {% elif "increase" in sentiment %}
+            <span class="positive">{{ sentiment }}</span>
+        {% else %}
+            <span>{{ sentiment }}</span>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    window.onload = function() {
+        const modalOverlay = document.getElementById('modalOverlay');
+        const closeBtn = document.getElementById('closeBtn');
+
+        modalOverlay.style.display = 'flex';
+
+        closeBtn.onclick = function() {
+            modalOverlay.style.display = 'none';
+        };
+
+        modalOverlay.onclick = function(e) {
+            if (e.target === modalOverlay) {
+                modalOverlay.style.display = 'none';
+            }
+        };
+    };
+</script>
+{% endif %}
+</body>
+</html>
+
+
+
+
+
